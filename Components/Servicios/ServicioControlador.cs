@@ -4,6 +4,8 @@ namespace blazernuevo.Components.Servicios
 {
     public class ServicioControlador
     {
+        public bool MostrarSoloJugados { get; set; } = false;
+
         private readonly ServicioJuegos _servicioJuegos;
 
         public ServicioControlador(ServicioJuegos servicioJuegos)

@@ -3,11 +3,11 @@
 @rendermode InteractiveServer
 @inject Servicios.ServicioControlador ServicioControlador
 
+
 <h3>Juegos</h3>
 
-Solo ver Jugados.<input type="checkbox" @bind="mostrarSoloJugados" />
-
-@if (mostrarSoloJugados)
+Solo ver Jugados.<input type="checkbox" @bind="ServicioControlador.MostrarSoloJugados" />
+@if (ServicioControlador.MostrarSoloJugados)
 {
     <ul>
         @foreach (var j in juegos.Where(j => j.Jugado))
@@ -16,6 +16,7 @@ Solo ver Jugados.<input type="checkbox" @bind="mostrarSoloJugados" />
           @j.Nombre
           @(j.Jugado ? "Ya jugado" : "Pendiente")
           <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
+          <button @onclick="() => BorrarJuego(j)">🗑️</button>
             </li>
         }
     </ul>
@@ -29,6 +30,7 @@ else
         @j.Nombre
         @(j.Jugado ? "Ya jugado" : "Pendiente")
         <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
+        <button @onclick="() => BorrarJuego(j)">🗑️</button>
             </li>
         }
     </ul>
@@ -51,6 +53,12 @@ else
         Console.WriteLine($"ME CAMBIARON YO: {j.Nombre}");
         j.Jugado = !j.Jugado;
     }
+
+
+  private void BorrarJuego(Juego juegoABorrar)
+    {
+        juegos.Remove(juegoABorrar);
+    }
 
     private async Task AgregarJuego()
     {

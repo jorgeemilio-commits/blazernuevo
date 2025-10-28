@@ -7,9 +7,5 @@
         public string Nombre { get; set; }
         public bool Jugado { get; set; }
 
-
-
-
-
     }
 }
