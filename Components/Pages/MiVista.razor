@@ -13,9 +13,9 @@ Solo ver Jugados.<input type="checkbox" @bind="mostrarSoloJugados" />
         @foreach (var j in juegos.Where(j => j.Jugado))
         {
             <li>
-                @j.Nombre
-                @(j.Jugado ? "Ya jugado" : "Pendiente")
-                <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
+          @j.Nombre
+          @(j.Jugado ? "Ya jugado" : "Pendiente")
+          <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
             </li>
         }
     </ul>
@@ -26,9 +26,9 @@ else
         @foreach (var j in juegos)
         {
             <li>
-                @j.Nombre
-                @(j.Jugado ? "Ya jugado" : "Pendiente")
-                <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
+        @j.Nombre
+        @(j.Jugado ? "Ya jugado" : "Pendiente")
+        <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
             </li>
         }
     </ul>
@@ -48,7 +48,7 @@ else
 
     private void cambiarJugado(Juego j)
     {
-        Console.WriteLine($"Cambiando estado de: {j.Nombre}");
+        Console.WriteLine($"ME CAMBIARON YO: {j.Nombre}");
         j.Jugado = !j.Jugado;
     }
 
