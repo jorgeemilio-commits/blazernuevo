@@ -1,6 +1,7 @@
 using blazernuevo.Components;
 using blazernuevo.Components.Data;
 using blazernuevo.Components.Servicios;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,5 +30,19 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+
+string ruta =  "mibase.db";
+
+using var conexion = new SqliteConnection($"DataSource={ruta}");
+conexion.Open();
+var comando = conexion.CreateCommand();
+comando.CommandText =
+    @"
+    CREATE TABLE IF NOT EXISTS 
+    juegos(identificador integer, nombre yext, jugado integer);
+    ";
+comando.ExecuteNonQuery();
+
 
 app.Run();

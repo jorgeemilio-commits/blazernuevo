@@ -58,6 +58,7 @@ else
   private void BorrarJuego(Juego juegoABorrar)
     {
         juegos.Remove(juegoABorrar);
+        ServicioControlador.BorrarJuego(juegoABorrar);
     }
 
     private async Task AgregarJuego()

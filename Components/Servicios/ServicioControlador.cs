@@ -29,5 +29,10 @@ namespace blazernuevo.Components.Servicios
             var juegos = await _servicioJuegos.ObtenerJuegos();
             return juegos.Any() ? juegos.Max(t=> t.Identificador) + 1 : 1;
         }
+
+        public async Task BorrarJuego(Juego juego)
+        {
+            await _servicioJuegos.BorrarJuego(juego);
+        }
     }
 }
