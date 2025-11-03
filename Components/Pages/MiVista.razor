@@ -17,6 +17,7 @@ Solo ver Jugados.<input type="checkbox" @bind="ServicioControlador.MostrarSoloJu
           @(j.Jugado ? "Ya jugado" : "Pendiente")
           <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
           <button @onclick="() => BorrarJuego(j)">🗑️</button>
+          <button @onclick="() => EditarJuego(j)">📝</button>
             </li>
         }
     </ul>
@@ -59,6 +60,12 @@ else
     {
         juegos.Remove(juegoABorrar);
         ServicioControlador.BorrarJuego(juegoABorrar);
+    }
+
+    private void EditarJuego(Juego juegoAEditar)
+    {
+        // Lógica para editar el juego
+        Console.WriteLine($"Editando juego: {juegoAEditar.Nombre}");
     }
 
     private async Task AgregarJuego()

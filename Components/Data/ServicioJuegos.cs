@@ -54,6 +54,22 @@ namespace blazernuevo.Components.Data
             juegos.Add(juego);
         }
 
+        public async Task ActualizarJuego(Juego juego)
+        {
+            string ruta = "mibase.db";
+            using var conexion = new SqliteConnection($"DataSource={ruta}");
+            await conexion.OpenAsync();
+            var comando = conexion.CreateCommand();
+
+            comando.CommandText = "UPDATE juegos SET nombre = $nombre, jugado = $jugado WHERE identificador = $id;";
+
+            comando.Parameters.AddWithValue("$id", juego.Identificador);
+            comando.Parameters.AddWithValue("$nombre", juego.Nombre);
+            comando.Parameters.AddWithValue("$jugado", juego.Jugado ? 1 : 0);
+
+            await comando.ExecuteNonQueryAsync();
+        }
+
 
         public async Task BorrarJuego(Juego juego) 
         {

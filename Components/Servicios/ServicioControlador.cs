@@ -34,5 +34,10 @@ namespace blazernuevo.Components.Servicios
         {
             await _servicioJuegos.BorrarJuego(juego);
         }
+
+        public async Task ActualizarJuego(Juego juego)
+        {
+            await _servicioJuegos.ActualizarJuego(juego);
+        }
     }
 }
