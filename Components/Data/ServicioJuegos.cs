@@ -12,30 +12,33 @@ namespace blazernuevo.Components.Data
         new Juego{Identificador=2,Nombre="Geometry Dash",Jugado=true}
         };
 
-        public async Task<List<Juego>> ObtenerJuegos()
+        public async Task<List<Juego>> ObtenerJuegos(bool mostrarSoloJugados = false)
         {
-            juegos.Clear();
+            List<Juego> juegos = new List<Juego>();
             string ruta = "mibase.db";
             using var conexion = new SqliteConnection($"DataSource={ruta}");
             await conexion.OpenAsync();
 
             var comando = conexion.CreateCommand();
 
-            comando.CommandText = "SELECT identificador, nombre, jugado FROM juegos;";
+            // realiza la consulta dependiendo de si se quieren solo los jugados o todos
+            string condicionWhere = mostrarSoloJugados ? "WHERE jugado = 1" : "";
+            comando.CommandText = $"SELECT identificador, nombre, jugado FROM juegos {condicionWhere};";
+
             using var lector = await comando.ExecuteReaderAsync();
 
             while (await lector.ReadAsync())
             {
-                juegos.Add(new Juego
+                juegos.Add(new Juego()
                 {
                     Identificador = lector.GetInt32(0),
                     Nombre = lector.GetString(1),
-                    Jugado = lector.GetInt32(2) == 0 ? false : true
+                    Jugado = lector.GetInt32(2) == 1
                 });
             }
+
             return juegos;
         }
-
         public async Task AgregarJuego(Juego juego)
         {
             string ruta = "mibase.db";
@@ -44,7 +47,7 @@ namespace blazernuevo.Components.Data
 
             var comando = conexion.CreateCommand();
 
-            comando.CommandText = "insert into juegos(identificador,nombre,jugado) values(3,'Mario Bros',1);";
+            comando.CommandText = "insert into juegos(identificador,nombre,jugado) values($identificador,$nombre,$jugado);";
             comando.Parameters.AddWithValue("$identificador", juego.Identificador);
             comando.Parameters.AddWithValue("$nombre", juego.Nombre);
             comando.Parameters.AddWithValue("$jugado", juego.Jugado ? 1 : 0);

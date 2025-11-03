@@ -6,36 +6,31 @@
 
 <h3>Juegos</h3>
 
-Solo ver Jugados.<input type="checkbox" @bind="ServicioControlador.MostrarSoloJugados" />
-@if (ServicioControlador.MostrarSoloJugados)
-{
-    <ul>
-        @foreach (var j in juegos.Where(j => j.Jugado))
-        {
-            <li>
-          @j.Nombre
-          @(j.Jugado ? "Ya jugado" : "Pendiente")
-          <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
-          <button @onclick="() => BorrarJuego(j)">🗑️</button>
-          <button @onclick="() => EditarJuego(j)">📝</button>
-            </li>
-        }
-    </ul>
-}
-else
-{
+Solo ver Jugados.
+<input type="checkbox" checked="@ServicioControlador.MostrarSoloJugados" @onchange="CambiarFiltro" />
+
+
     <ul>
         @foreach (var j in juegos)
         {
             <li>
-        @j.Nombre
-        @(j.Jugado ? "Ya jugado" : "Pendiente")
-        <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
-        <button @onclick="() => BorrarJuego(j)">🗑️</button>
+                @if (juegoEnEdicion != null && juegoEnEdicion.Identificador == j.Identificador)
+                {
+                    <input @bind="juegoEnEdicion.Nombre" />
+                    <button @onclick="GuardarEdicion">💾</button> @* Guardar (Save) *@
+                    <button @onclick="CancelarEdicion">❌</button> @* Cancelar (Cancel) *@
+                }
+                else
+                {
+                    @j.Nombre
+                    @(j.Jugado ? "Ya jugado" : "Pendiente")
+                    <input type="checkbox" checked="@j.Jugado" @onclick="()=> cambiarJugado(j)" />
+                    <button @onclick="() => EditarJuego(j)">📝</button> @* Editar (Edit) *@
+                    <button @onclick="() => BorrarJuego(j)">🗑️</button>
+                }
             </li>
         }
     </ul>
-}
 
 
 <div>
@@ -46,38 +41,71 @@ else
 @code {
     private List<Juego> juegos = new();
     private Juego newJuego = new();
+    private Juego juegoEnEdicion = null; 
+    private bool mostrarSoloJugados = false; 
 
-    private bool mostrarSoloJugados = false;
-
-    private void cambiarJugado(Juego j)
+    // cambiar el estado  y actualizar la base de datos
+    private async Task cambiarJugado(Juego j)
     {
         Console.WriteLine($"ME CAMBIARON YO: {j.Nombre}");
         j.Jugado = !j.Jugado;
+        await ServicioControlador.ActualizarJuego(j); 
+        juegos = await ServicioControlador.ObtenerJuegos();
     }
 
+    // inicia la edición
+    private void EditarJuego(Juego j)
+    {
+        juegoEnEdicion = new Juego
+        {
+            Identificador = j.Identificador,
+            Nombre = j.Nombre,
+            Jugado = j.Jugado
+        };
+    }
 
-  private void BorrarJuego(Juego juegoABorrar)
+    // guarda la edición
+    private async Task GuardarEdicion()
+    {
+        if (juegoEnEdicion != null && !string.IsNullOrWhiteSpace(juegoEnEdicion.Nombre))
+        {
+            await ServicioControlador.ActualizarJuego(juegoEnEdicion);
+            juegos = await ServicioControlador.ObtenerJuegos();
+            juegoEnEdicion = null;
+        }
+    }
+
+    // cancela la edición
+    private void CancelarEdicion()
+    {
+        juegoEnEdicion = null;
+    }
+
+    // borra un juego
+    private async Task BorrarJuego(Juego juegoABorrar)
     {
         juegos.Remove(juegoABorrar);
-        ServicioControlador.BorrarJuego(juegoABorrar);
+        await ServicioControlador.BorrarJuego(juegoABorrar);
+        juegos = await ServicioControlador.ObtenerJuegos();
     }
 
-    private void EditarJuego(Juego juegoAEditar)
+    // actualiza el filtro
+    private async Task CambiarFiltro(ChangeEventArgs e)
     {
-        // Lógica para editar el juego
-        Console.WriteLine($"Editando juego: {juegoAEditar.Nombre}");
+        ServicioControlador.MostrarSoloJugados = (bool)e.Value;
+        juegos = await ServicioControlador.ObtenerJuegos();
     }
 
+    // agregar un juego
     private async Task AgregarJuego()
     {
         if (!string.IsNullOrWhiteSpace(newJuego.Nombre))
         {
-            ServicioControlador.AgregarJuego(newJuego);
+            await ServicioControlador.AgregarJuego(newJuego);
             juegos = await ServicioControlador.ObtenerJuegos();
             newJuego = new Juego();
         }
     }
-
     protected override async Task OnInitializedAsync()
     {
         juegos = await ServicioControlador.ObtenerJuegos();

@@ -12,12 +12,10 @@ namespace blazernuevo.Components.Servicios
         {
             _servicioJuegos = servicioJuegos;
         }
-
         public async Task<List<Juego>> ObtenerJuegos()
         {
-            return await _servicioJuegos.ObtenerJuegos();
+            return await _servicioJuegos.ObtenerJuegos(MostrarSoloJugados);
         }
-
         public async Task AgregarJuego(Juego juego)
         {
             juego.Identificador = await GenerarNuevoID();
