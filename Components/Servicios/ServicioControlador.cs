@@ -1,10 +1,13 @@
 ﻿using blazernuevo.Components.Data;
+using System.Linq;
 
 namespace blazernuevo.Components.Servicios
 {
     public class ServicioControlador
     {
         public bool MostrarSoloJugados { get; set; } = false;
+
+        public string FiltroNombre { get; set; } = string.Empty;
 
         private readonly ServicioJuegos _servicioJuegos;
 
@@ -14,7 +17,7 @@ namespace blazernuevo.Components.Servicios
         }
         public async Task<List<Juego>> ObtenerJuegos()
         {
-            return await _servicioJuegos.ObtenerJuegos(MostrarSoloJugados);
+            return await _servicioJuegos.ObtenerJuegos(MostrarSoloJugados, FiltroNombre);
         }
         public async Task AgregarJuego(Juego juego)
         {

@@ -1,43 +1,53 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Threading.Tasks; 
+using System.Linq;
 
 namespace blazernuevo.Components.Data
 {
     public class ServicioJuegos
     {
-        private List<Juego> juegos = new List<Juego>
-        {
-        new Juego{Identificador=1,Nombre="Ravel",Jugado=false },
-        new Juego{Identificador=2,Nombre="Geometry Dash",Jugado=true}
-        };
+        private List<Juego> juegos = new List<Juego>();
 
-        public async Task<List<Juego>> ObtenerJuegos(bool mostrarSoloJugados = false)
+        public async Task<List<Juego>> ObtenerJuegos(bool mostrarSoloJugados = false, string filtroNombre = null)
         {
-            List<Juego> juegos = new List<Juego>();
+            var listaJuegos = new List<Juego>();
+
             string ruta = "mibase.db";
             using var conexion = new SqliteConnection($"DataSource={ruta}");
             await conexion.OpenAsync();
 
             var comando = conexion.CreateCommand();
 
-            // realiza la consulta dependiendo de si se quieren solo los jugados o todos
-            string condicionWhere = mostrarSoloJugados ? "WHERE jugado = 1" : "";
+            // --- Lógica de filtrado con WHERE dinámica ---
+            var whereClauses = new List<string>();
+
+            if (mostrarSoloJugados)
+            {
+                whereClauses.Add("jugado = 1");
+            }
+            if (!string.IsNullOrWhiteSpace(filtroNombre))
+            {
+                whereClauses.Add("nombre LIKE $filtroNombre");
+                comando.Parameters.AddWithValue("$filtroNombre", $"%{filtroNombre}%");
+            }
+            string condicionWhere = whereClauses.Any() ? "WHERE " + string.Join(" AND ", whereClauses) : "";
+
+            // Construye el comando final
             comando.CommandText = $"SELECT identificador, nombre, jugado FROM juegos {condicionWhere};";
 
             using var lector = await comando.ExecuteReaderAsync();
 
             while (await lector.ReadAsync())
             {
-                juegos.Add(new Juego()
+                listaJuegos.Add(new Juego
                 {
                     Identificador = lector.GetInt32(0),
                     Nombre = lector.GetString(1),
-                    Jugado = lector.GetInt32(2) == 1
+                    Jugado = lector.GetInt32(2) != 0
                 });
             }
-
-            return juegos;
+            return listaJuegos;
         }
         public async Task AgregarJuego(Juego juego)
         {

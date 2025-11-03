@@ -40,7 +40,7 @@ var comando = conexion.CreateCommand();
 comando.CommandText =
     @"
     CREATE TABLE IF NOT EXISTS 
-    juegos(identificador integer, nombre yext, jugado integer);
+    juegos(identificador integer, nombre text, jugado integer);
     ";
 comando.ExecuteNonQuery();
 
